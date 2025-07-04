@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 import mysql.connector
 import os
+import csv
+import uuid
+from decimal import Decimal
 
 def connect_db():
     """
@@ -65,17 +68,45 @@ def create_table(connection):
             )
         """)
         print("Table created | Table Already exists")
-        connection.close()
+        cursor.close()
 
-def insert_data(connection, data):
-    """
-    Insert data into table
-    """
-    connection = connect_to_prodev()
-    if connection:
+def insert_data(connection, csv_file_path):
+    try:
         cursor = connection.cursor()
-        query = "INSERT INTO users (name, email, age) VALUES (%s, %s, %s)"
-        cursor.execute(query, data)
+
+        with open(csv_file_path, 'r') as file:
+            csv_reader = csv.DictReader(file)
+
+            for row in csv_reader:
+                email = row['email'].strip()
+
+                # Check for duplicate
+                cursor.execute("SELECT user_id FROM user_data WHERE email = %s", (email,))
+                if cursor.fetchone():
+                    print(f"Skipping duplicate: {email}")
+                    continue
+
+                try:
+                    user_id = str(uuid.uuid4())
+                    name = row['name'].strip()
+                    age = Decimal(row['age'])
+
+                    cursor.execute("""
+                        INSERT INTO user_data (user_id, name, email, age)
+                        VALUES (%s, %s, %s, %s)
+                    """, (user_id, name, email, age))
+
+                except (ValueError, KeyError) as e:
+                    print(f"Skipping row due to error: {e} - Row: {row}")
+                    continue
+
         connection.commit()
-        print("Data inserted successfully")
-        connection.close()
+        print("Successfully inserted user records.")
+
+    except mysql.connector.Error as e:
+        connection.rollback()
+        print(f"Error during data insertion: {e}")
+    finally:
+        cursor.close()
+
+

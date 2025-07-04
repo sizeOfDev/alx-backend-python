@@ -10,7 +10,7 @@ def connect_db():
         connection = mysql.connector.connect(
             host=os.getenv("DB_HOST", "localhost"),
             user=os.getenv("DB_USER", "root"),
-            password=os.getenv("DB_PASS", "")
+            password=os.getenv("DB_PASS", "secret")
         )
         if connection.is_connected():
             print("Connected to Database server")
@@ -38,7 +38,7 @@ def connect_to_prodev():
         connection = mysql.connector.connect(
             host=os.getenv("DB_HOST", "localhost"),
             user=os.getenv("DB_USER", "root"),
-            password=os.getenv("DB_PASS", ""),
+            password=os.getenv("DB_PASS", "secret"),
             database="ALX_prodev"
         )
         if connection.is_connected():
@@ -56,7 +56,7 @@ def create_table(connection):
     if connection:
         cursor = connection.cursor()
         cursor.execute("""
-           CREATE TABLE users (
+           CREATE TABLE IF NOT EXISTS user_data (
            user_id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
            name VARCHAR(255) NOT NULL,
            email VARCHAR(255) NOT NULL,

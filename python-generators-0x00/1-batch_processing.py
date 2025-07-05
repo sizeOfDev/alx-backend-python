@@ -15,7 +15,7 @@ def stream_users_in_batches(batch_size):
     
     offset = 0
     while True:
-        cursor.execute("SELECT * FROM users LIMIT %s OFFSET %s", (batch_size, offset))
+        cursor.execute("SELECT * FROM user_data LIMIT %s OFFSET %s", (batch_size, offset))
         users = cursor.fetchall()
         
         if not users:

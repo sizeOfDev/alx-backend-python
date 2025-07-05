@@ -14,7 +14,7 @@ def paginate_users(page_size, offset):
     db = connect_to_prodev()
     cursor = db.cursor()
     
-    cursor.execute("SELECT * FROM users LIMIT %s OFFSET %s", (page_size, offset))
+    cursor.execute("SELECT * FROM user_data LIMIT %s OFFSET %s", (page_size, offset))
     users = cursor.fetchall()
     
     if not users:

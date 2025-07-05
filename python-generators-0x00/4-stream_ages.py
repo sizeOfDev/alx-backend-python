@@ -10,7 +10,7 @@ def stream_user_ages():
     db = connect_to_prodev()
     cursor = db.cursor()
     
-    cursor.execute("SELECT age FROM users")
+    cursor.execute("SELECT age FROM user_data")
     users = cursor.fetchall()
     
     for (age,) in users:

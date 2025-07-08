@@ -4,7 +4,7 @@ from functools import wraps
 def with_db_connection(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        with sqlite3.connect('decorator.db') as conn:
+        with sqlite3.connect('users.db') as conn:
             kwargs['conn'] = conn
         return func(*args, **kwargs)
     return wrapper

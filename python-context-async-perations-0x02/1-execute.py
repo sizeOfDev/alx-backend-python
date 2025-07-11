@@ -29,7 +29,7 @@ class  ExecuteQuery():
             self.conn.close()
 
 
-with ExecuteQuery('SELECT name FROM users WHERE age > ?', 22) as cursor:
+with ExecuteQuery('SELECT name FROM users WHERE age > ?', 25) as cursor:
     users = cursor.fetchall()
     for user in users:
         print(user)

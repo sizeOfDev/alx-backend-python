@@ -23,6 +23,7 @@ class TestAccessNestedMap(unittest.TestCase):
         ({"a": {"b": 2}}, ("a", "b"), 2)
     ])
     def test_access_nested_map(self, nested_map, path,  expected):
+        """Test access_nested_map with valid paths."""
         result = access_nested_map(nested_map, path)
         self.assertEqual(result, expected)
 
@@ -31,6 +32,7 @@ class TestAccessNestedMap(unittest.TestCase):
         ({"a": 1}, ("a", "b")),
     ])
     def test_access_nested_map_exception(self, nested_map, path):
+        """Test access_nested_map with invalid paths."""
         with self.assertRaises(KeyError):
             access_nested_map(nested_map, path)
 
@@ -49,6 +51,7 @@ class TestGetJson(unittest.TestCase):
         ("http://holberton.io", {"payload": False})
     ])
     def test_get_json(self, test_url, payload):
+        """Test get_json with mocked requests."""
         with patch("utils.requests.get") as mock_get:
             mock_result = mock_get.return_value
             mock_result.json.return_value = payload

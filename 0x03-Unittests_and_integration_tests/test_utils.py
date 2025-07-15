@@ -17,12 +17,11 @@ class TestAccessNestedMap(unittest.TestCase):
     """
 
     @parameterized.expand([
-        ("case 1", {"a": 1}, ("a",), 1),
-        ("case 2", {"a": {"b": 2}}, ("a",), {"b": 2}),
-        ("case 3", {"a": {"b": 2}}, ("a", "b"), 2)
+        ({"a": 1}, ("a",), 1),
+        ({"a": {"b": 2}}, ("a",), {"b": 2}),
+        ({"a": {"b": 2}}, ("a", "b"), 2)
     ])
-    def test_access_nested_map(self, name, nested_map, path,  expected):
-        """Run test case: {name}"""
+    def test_access_nested_map(self, nested_map, path,  expected):
         result = access_nested_map(nested_map, path)
         self.assertEqual(result, expected)
 

@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 
+"""
+Unit tests for utils.py
+This module contains unit tests for the utility functions
+defined in utils.py. It uses unittest and parameterized
+to test various scenarios for each function.
+"""
+
 import unittest
 from unittest.mock import patch
 from parameterized import parameterized

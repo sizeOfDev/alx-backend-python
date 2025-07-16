@@ -27,6 +27,3 @@ class TestGithubOrgClient(unittest.TestCase):
         mock_get_json.assert_called_once_with(
             f"https://api.github.com/orgs/{org_name}"
         )
-        mock_get_json.return_value = {"repos_url":
-                                      "https://api.github.com/"
-                                      "orgs/google/repos"}

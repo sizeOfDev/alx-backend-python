@@ -1,6 +1,5 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, filters
 from rest_framework.response import Response
-from rest_framework.decorators import action
 from .models import Conversation, Message, users
 from .serializers import (
     ConversationSerializer,
@@ -9,9 +8,13 @@ from .serializers import (
 )
 from django.shortcuts import get_object_or_404
 
+
 class ConversationViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['created_at']
+    ordering = ['-created_at']
+    
     def get_queryset(self):
         return Conversation.objects.filter(participants=self.request.user).distinct()
 
@@ -24,24 +27,20 @@ class ConversationViewSet(viewsets.ModelViewSet):
         conversation = serializer.save()
         conversation.participants.add(self.request.user)
 
+
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     permission_classes = [permissions.IsAuthenticated]
-
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['sent_at']
+    ordering = ['sent_at']  
     def get_queryset(self):
-        conversation_id = self.kwargs.get('conversation_pk')
-        conversation = get_object_or_404(Conversation, conversation_id=conversation_id)
-
-        if self.request.user not in conversation.participants.all():
-            return Message.objects.none()
-
-        return Message.objects.filter(conversation=conversation).order_by('sent_at')
+        return Message.objects.filter(
+            conversation__participants=self.request.user
+        ).select_related('conversation', 'sender').order_by('sent_at')
 
     def perform_create(self, serializer):
-        conversation_id = self.kwargs.get('conversation_pk')
-        conversation = get_object_or_404(Conversation, conversation_id=conversation_id)
-
+        conversation = serializer.validated_data['conversation']
         if self.request.user not in conversation.participants.all():
-            return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
-
-        serializer.save(sender=self.request.user, conversation=conversation)
+            raise PermissionDenied("You are not a participant of this conversation.")
+        serializer.save(sender=self.request.user)

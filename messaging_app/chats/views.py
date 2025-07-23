@@ -37,8 +37,21 @@ class MessageViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsParticipantOfConversation]
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['sent_at']
-    ordering = ['sent_at']  
+    ordering = ['sent_at'] 
+
     def get_queryset(self):
+
+        conversation_id = self.kwargs.get('conversation_pk')  
+        if not conversation_id:
+            return Message.objects.none()
+        try:
+            conversation = Conversation.objects.get(conversation_id=conversation_id)
+        except Conversation.DoesNotExist:
+            return Response({"detail": "Conversation not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        if not Conversation.objects.filter(conversation_id=conversation_id, participants=self.request.user).exists():
+            return Response({"detail": "You are not a participant of this conversation."}, status=status.HTTP_403_FORBIDDEN)    
+       
         return Message.objects.filter(
             conversation__participants=self.request.user
         ).select_related('conversation', 'sender').order_by('sent_at')

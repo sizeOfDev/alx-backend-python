@@ -5,12 +5,14 @@ from .serializers import (
     ConversationSerializer,
     ConversationCreateSerializer,
     MessageSerializer,
+    UserRegisterSerializer
 )
-from django.shortcuts import get_object_or_404
+from .permissions import IsParticipantOfConversation
+from rest_framework.permissions import AllowAny
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsParticipantOfConversation]
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['created_at']
     ordering = ['-created_at']
@@ -44,3 +46,8 @@ class MessageViewSet(viewsets.ModelViewSet):
         if self.request.user not in conversation.participants.all():
             raise PermissionDenied("You are not a participant of this conversation.")
         serializer.save(sender=self.request.user)
+
+class RegisterView(generics.CreateAPIView):
+    queryset = users.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = UserRegisterSerializer

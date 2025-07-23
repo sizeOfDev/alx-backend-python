@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions, status, filters
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from .models import Conversation, Message, users
 from .serializers import (
@@ -9,6 +10,7 @@ from .serializers import (
 )
 from .permissions import IsParticipantOfConversation
 from rest_framework.permissions import AllowAny
+from rest_framework import generics
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -32,7 +34,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsParticipantOfConversation]
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['sent_at']
     ordering = ['sent_at']  

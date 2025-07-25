@@ -134,8 +134,16 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication'
     ],
-    'DEFAULT_PAGINATION_CLASS': 'PageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'chats.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+}
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'USER_ID_FIELD': 'user_id',  
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+   
 }
 
 AUTH_USER_MODEL = 'chats.users'

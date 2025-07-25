@@ -14,6 +14,10 @@ class users(AbstractUser):
     birthdate = models.DateField(blank=True, null=True)
     last_seen = models.DateTimeField(default=timezone.now)
 
+    @property
+    def id(self):
+        return self.user_id
+
     def __str__(self):
         return self.username
 

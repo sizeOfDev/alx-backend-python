@@ -6,7 +6,8 @@ from .serializers import (
     ConversationSerializer,
     ConversationCreateSerializer,
     MessageSerializer,
-    UserRegisterSerializer
+    UserRegisterSerializer,
+    UsersSerializer
 )
 from .permissions import IsParticipantOfConversation
 from rest_framework.permissions import AllowAny
@@ -72,3 +73,7 @@ class RegisterView(generics.CreateAPIView):
     queryset = users.objects.all()
     permission_classes = [AllowAny]
     serializer_class = UserRegisterSerializer
+
+class UserView(viewsets.ReadOnlyModelViewSet):
+    queryset = users.objects.all()
+    serializer_class = UsersSerializer

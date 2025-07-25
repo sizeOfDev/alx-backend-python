@@ -46,7 +46,7 @@ class ConversationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Conversation
-        fields = ['conversation_id', 'participants', 'created_at', 'messages']
+        fields = ['conversation_id', 'participants', 'created_at', 'messages', 'last_message']
 
     def get_last_message(self, obj):
         last = obj.messages.order_by('-sent_at').first()
@@ -55,11 +55,15 @@ class ConversationSerializer(serializers.ModelSerializer):
         return None
     
 class ConversationCreateSerializer(serializers.ModelSerializer):
-    participants = serializers.PrimaryKeyRelatedField(queryset=users.objects.all(), many=True)
+    participants = serializers.PrimaryKeyRelatedField(
+    queryset=users.objects.all(),
+    many=True,
+    pk_field=serializers.UUIDField()
+)
 
     class Meta:
         model = Conversation
-        fields = ['participants']
+        fields = ['conversation_id', 'participants', 'created_at']
 
     def validate_participants(self, value):
         if len(value) < 2:

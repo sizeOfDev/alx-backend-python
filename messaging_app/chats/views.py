@@ -11,6 +11,9 @@ from .serializers import (
 from .permissions import IsParticipantOfConversation
 from rest_framework.permissions import AllowAny
 from rest_framework import generics
+from .pagination import StandardResultsSetPagination
+from .filters import MessageFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -38,6 +41,9 @@ class MessageViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['sent_at']
     ordering = ['sent_at'] 
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = MessageFilter
 
     def get_queryset(self):
 

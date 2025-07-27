@@ -40,3 +40,45 @@ class RestrictAccessByTimeMiddleware:
         response = self.get_response(request)
         
         return response
+    
+
+class OffensiveLanguageMiddleware:
+    def __init__(self, get_response):
+         self.get_response = get_response
+         self.request = {}
+
+    def __call__(self, request):
+
+        if request.method == 'POST':
+            ip_address = request.META.get('REMOTE_ADDR')
+            current_time = datetime.now().time()
+
+            if ip_address in self.request:
+                last_request_time, request_count = self.request[ip_address]
+                if (current_time.hour - last_request_time.hour) * 60 + (current_time.minute - last_request_time.minute) < 1:
+                    return HttpResponseForbidden("You are making requests too frequently.", status=429)
+                else:
+                    if request_count >= 5:
+                        return HttpResponseForbidden("You have exceeded the request limit.", status=429)
+                    self.request[ip_address] = (last_request_time, request_count + 1)
+            else:
+                self.request[ip_address] = (current_time, 1)
+
+        response = self.get_response(request)
+
+        return response
+    
+class RolepermissionMiddleware:
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+
+    def __call__(self, request):
+        
+        if request.user.is_authenticated:
+            if not (request.user.groups.filter(name='admin').exists() or request.user.groups.filter(name='moderator').exists()):
+                return HttpResponseForbidden("You do not have permission to perform this action.")
+
+        response = self.get_response(request)
+        return response
